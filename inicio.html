@@ -20,11 +20,13 @@
 
     <div class="interface">
 
-        <div class="logo">
-            <a href="#inicio">
-                <img class="img" src="img/Zyvo.png" alt="Logo Zyvo">
-            </a>
-        </div>
+       <div class="logo">
+    <a href="#inicio">
+        <img class="logo-escura" src="img/Zyvo.png" alt="Logo Zyvo">
+        <img class="logo-clara" src="img/Zyvo-clara.png" alt="Logo Zyvo">
+    </a>
+</div>
+
 
         <!-- MENU DESKTOP -->
         <nav class="menu-desktop">
@@ -41,6 +43,15 @@
                 <button>Contato</button>
             </a>
         </div>
+
+        <!-- BOTÃO TEMA -->
+
+        <button 
+    class="theme-btn" 
+    id="themeBtn" 
+    aria-label="Alternar tema">
+    <i class="bi bi-sun-fill"></i>
+</button>
 
         <!-- BOTÃO MENU MOBILE -->
         <button
@@ -69,6 +80,7 @@
         >
             ×
         </button>
+
 
     </div>
 
@@ -504,26 +516,61 @@ const mensagemSucesso =
     document.getElementById("mensagemSucesso");
 
 
-formulario.addEventListener("submit", function(event) {
-
-    // Impede o recarregamento da página
+formulario.addEventListener("submit", async function(event) {
     event.preventDefault();
 
+    const dados = {
+        nome: document.getElementById("nome").value,
+        email: document.getElementById("email").value,
+        telefone: document.getElementById("telefone").value,
+        assunto: document.getElementById("assunto").value
+    };
 
-    // Mostra a mensagem
-    mensagemSucesso.classList.add("mostrar");
+    const resposta = await fetch("http://localhost:3000/api/contatos", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+    });
 
+    if (resposta.ok) {
+        mensagemSucesso.classList.add("mostrar");
+        formulario.reset();
+    }
+});
 
-    // Limpa os campos do formulário
-    formulario.reset();
+const themeBtn = document.getElementById("themeBtn");
 
+const temaSalvo = localStorage.getItem("tema");
 
-    // Esconde a mensagem depois de 5 segundos
-    setTimeout(function() {
+// Verifica o tema salvo
+if (temaSalvo === "claro") {
+    document.body.classList.add("light-mode");
+    themeBtn.innerHTML = '<i class="bi bi-moon-fill"></i>';
+} else {
+    themeBtn.innerHTML = '<i class="bi bi-sun-fill"></i>';
+}
 
-        mensagemSucesso.classList.remove("mostrar");
+// Trocar tema
+themeBtn.addEventListener("click", () => {
 
-    }, 5000);
+    document.body.classList.toggle("light-mode");
+
+    if (document.body.classList.contains("light-mode")) {
+
+        // Modo claro → mostra lua
+        themeBtn.innerHTML = '<i class="bi bi-moon-fill"></i>';
+
+        localStorage.setItem("tema", "claro");
+
+    } else {
+
+        // Modo escuro → mostra sol
+        themeBtn.innerHTML = '<i class="bi bi-sun-fill"></i>';
+
+        localStorage.setItem("tema", "escuro");
+    }
 
 });
 
